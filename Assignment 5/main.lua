@@ -1,3 +1,6 @@
+--print(display.actualContentWidth)
+--print(display.actualContentHeight)
+
 local Background = display.newImage ("./assets/BG.jpg")
 
 local playerBall = display.newImageRect ("./assets/ball2.png", 50, 50)
@@ -46,10 +49,15 @@ rightArrow.alpha = 0.5
 rightArrow.id = "right arrow"
 
 local physics = require( "physics" )
+physics.start()
+physics.setGravity( 0, 0)
+physics.setDrawMode( "hybrid" )
 
-local leftWall = display.newRect( 0, display.contentHeight / 2, 1, display.contentHeight )
+local leftWall = display.newRect( -230, display.contentHeight / 2, 500, display.contentHeight )
 
 leftWall:setFillColor( 0,3,10 )
+
+
 
 physics.addBody( leftWall, "static", { 
 
@@ -59,11 +67,11 @@ physics.addBody( leftWall, "static", {
 
     } )
 
-local leftWall = display.newRect( 0, display.contentHeight / 2, 1, display.contentHeight )
+local rightWall = display.newRect( 550, display.contentHeight / 2, 500, display.contentHeight )
 
-leftWall:setFillColor( 0,3,10 )
+rightWall:setFillColor( 0,3,10 )
 
-physics.addBody( leftWall, "static", { 
+physics.addBody( rightWall, "static", { 
 
     friction = 0.5, 
 
@@ -71,7 +79,39 @@ physics.addBody( leftWall, "static", {
 
     } )
 
+local topWall = display.newRect( 0, -250, display.contentWidth * 2, 500 )
 
+topWall:setFillColor( 0,3,10 )
+
+physics.addBody( topWall, "static", { 
+
+    friction = 0.5, 
+
+    bounce = 0.3 
+
+    } )
+
+local bottomWall = display.newRect( 550, display.contentHeight / 2, 500, display.contentHeight )
+
+bottomWall:setFillColor( 0,3,10 )
+
+physics.addBody( bottomWall, "static", { 
+
+    friction = 0.5, 
+
+    bounce = 0.3 
+
+    } )
+
+physics.addBody( playerBall, "dynamic", { 
+
+    density = 3.0, 
+
+    friction = 0.5, 
+
+    bounce = 0.3
+
+    } )
 
 function upArrow:touch( event )
 
@@ -81,13 +121,13 @@ function upArrow:touch( event )
 
         transition.moveBy( playerBall, { 
 
-        	x = 0, -- move 0 in the x direction 
+            x = 0, -- move 0 in the x direction 
 
-        	y = -50, -- move up 50 pixels
+            y = -50, -- move up 50 pixels
 
-        	time = 100 -- move in a 1/10 of a second
+            time = 100 -- move in a 1/10 of a second
 
-        	} )
+            } )
 
     end
 
@@ -105,13 +145,13 @@ function downArrow:touch( event )
 
         transition.moveBy( playerBall, { 
 
-        	x = 0, -- move 0 in the x direction 
+            x = 0, -- move 0 in the x direction 
 
-        	y = 50, -- move down 50 pixels
+            y = 50, -- move down 50 pixels
 
-        	time = 100 -- move in a 1/10 of a second
+            time = 100 -- move in a 1/10 of a second
 
-        	} )
+            } )
 
     end
 
@@ -129,13 +169,13 @@ function leftArrow:touch( event )
 
         transition.moveBy( playerBall, { 
 
-        	x = -50, -- move 50 pixels left 
+            x = -50, -- move 50 pixels left 
 
-        	y = 0, 
+            y = 0, 
 
-        	time = 100 -- move in a 1/10 of a second
+            time = 100 -- move in a 1/10 of a second
 
-        	} )
+            } )
 
     end
 
@@ -153,13 +193,13 @@ function rightArrow:touch( event )
 
         transition.moveBy( playerBall, { 
 
-        	x = 50, -- move 50 pixelfs right
+            x = 50, -- move 50 pixelfs right
 
-        	y = 0, 
+            y = 0, 
 
-        	time = 100 -- move in a 1/10 of a second
+            time = 100 -- move in a 1/10 of a second
 
-        	} )
+            } )
 
     end
 
