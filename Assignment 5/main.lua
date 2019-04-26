@@ -6,7 +6,16 @@ local Background = display.newImage ("./assets/BG.jpg")
 local playerBall = display.newImageRect ("./assets/ball2.png", 50, 50)
 playerBall.x = display.contentCenterX
 playerBall.y = display.contentCenterY - 100
+playerBall.id = "player"
+playerBall.isFixedRotation = true
 
+local enemyBall = display.newImageRect ("./assets/ball1.png", 20, 20)
+enemyBall.x = display.contentCenterX
+enemyBall.y = display.contentCenterY - 160
+enemyBall.id = "enemy"
+
+local eSpeedX
+local eSpeedY
 
 local upArrow = display.newImage( "./assets/upArrow.png" )
 
@@ -91,7 +100,7 @@ physics.addBody( topWall, "static", {
 
     } )
 
-local bottomWall = display.newRect( 550, display.contentHeight / 2, 500, display.contentHeight )
+local bottomWall = display.newRect( 0, 250, display.contentWidth * 2, 70 )
 
 bottomWall:setFillColor( 0,3,10 )
 
@@ -105,7 +114,17 @@ physics.addBody( bottomWall, "static", {
 
 physics.addBody( playerBall, "dynamic", { 
 
-    density = 3.0, 
+    density = 0.5, 
+
+    friction = 0.5, 
+
+    bounce = 0.3
+
+    } )
+
+physics.addBody( enemyBall, "dynamic", { 
+
+    density = 0.5, 
 
     friction = 0.5, 
 
@@ -123,7 +142,7 @@ function upArrow:touch( event )
 
             x = 0, -- move 0 in the x direction 
 
-            y = -50, -- move up 50 pixels
+            y = -25, -- move up 50 pixels
 
             time = 100 -- move in a 1/10 of a second
 
@@ -147,7 +166,7 @@ function downArrow:touch( event )
 
             x = 0, -- move 0 in the x direction 
 
-            y = 50, -- move down 50 pixels
+            y = 25, -- move down 50 pixels
 
             time = 100 -- move in a 1/10 of a second
 
@@ -169,7 +188,7 @@ function leftArrow:touch( event )
 
         transition.moveBy( playerBall, { 
 
-            x = -50, -- move 50 pixels left 
+            x = -25, -- move 50 pixels left 
 
             y = 0, 
 
@@ -193,7 +212,7 @@ function rightArrow:touch( event )
 
         transition.moveBy( playerBall, { 
 
-            x = 50, -- move 50 pixelfs right
+            x = 25, -- move 50 pixelfs right
 
             y = 0, 
 
@@ -209,6 +228,24 @@ function rightArrow:touch( event )
 
 end
 
+local function playerCollision (event)
+	if ( event.phase == "began") then
+
+		local thing1 = event.object1
+		local thing2 = event.object2
+
+		if ((object1.id == "enemy" and object2.id == "player") or
+			(object1.id == "player" and object2.id == "enemy")) then
+
+			display.remove (thing1)
+			display.remove (thing2)
+			local GameOver = display.newText ("Game Over", display.contentCenterX, display.contentCenterY, native.systemFont, 30)
+		end
+	end
+end
+
+
+
 
 
 
@@ -216,3 +253,9 @@ upArrow:addEventListener( "touch", upArrow )
 downArrow:addEventListener( "touch", downArrow )
 leftArrow:addEventListener( "touch", leftArrow )
 rightArrow:addEventListener( "touch", rightArrow )
+
+playerBall.collision = playerCollision
+playerBall:addEventListener("collision") 
+
+enemyBall.collision = playerCollision
+enemyBall:addEventListener("collision") 
