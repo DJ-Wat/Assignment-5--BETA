@@ -1,9 +1,6 @@
---print(display.actualContentWidth)
---print(display.actualContentHeight)
-
 local Background = display.newImage ("./assets/BG.jpg")
 
-local playerBall = display.newImageRect ("./assets/ball2.png", 50, 50)
+local playerBall = display.newImageRect ("./assets/ball2.png", 35, 35)
 playerBall.x = display.contentCenterX
 playerBall.y = display.contentCenterY - 100
 playerBall.id = "player"
@@ -11,11 +8,11 @@ playerBall.isFixedRotation = true
 
 local enemyBall = display.newImageRect ("./assets/ball1.png", 20, 20)
 enemyBall.x = display.contentCenterX
-enemyBall.y = display.contentCenterY - 160
+enemyBall.y = display.contentCenterY - 200
 enemyBall.id = "enemy"
 
-local eSpeedX
-local eSpeedY
+
+
 
 local upArrow = display.newImage( "./assets/upArrow.png" )
 
@@ -60,13 +57,11 @@ rightArrow.id = "right arrow"
 local physics = require( "physics" )
 physics.start()
 physics.setGravity( 0, 0)
-physics.setDrawMode( "hybrid" )
+--physics.setDrawMode( "hybrid" )
 
 local leftWall = display.newRect( -230, display.contentHeight / 2, 500, display.contentHeight )
 
 leftWall:setFillColor( 0,3,10 )
-
-
 
 physics.addBody( leftWall, "static", { 
 
@@ -75,6 +70,10 @@ physics.addBody( leftWall, "static", {
     bounce = 0.3 
 
     } )
+
+leftWall.collisionType = "wall"
+
+leftWall.id = "left wall"
 
 local rightWall = display.newRect( 550, display.contentHeight / 2, 500, display.contentHeight )
 
@@ -88,6 +87,10 @@ physics.addBody( rightWall, "static", {
 
     } )
 
+rightWall.id = "right wall"
+
+rightWall.collisionType = "wall"
+
 local topWall = display.newRect( 0, -250, display.contentWidth * 2, 500 )
 
 topWall:setFillColor( 0,3,10 )
@@ -100,7 +103,11 @@ physics.addBody( topWall, "static", {
 
     } )
 
-local bottomWall = display.newRect( 0, 250, display.contentWidth * 2, 70 )
+topWall.collisionType = "wall"
+
+topWall.id = "top wall"
+
+local bottomWall = display.newRect( 0, 250, display.contentWidth * 2, 90 )
 
 bottomWall:setFillColor( 0,3,10 )
 
@@ -112,9 +119,13 @@ physics.addBody( bottomWall, "static", {
 
     } )
 
+bottomWall.collisionType = "wall"
+
+bottomWall.id = "bottom wall"
+
 physics.addBody( playerBall, "dynamic", { 
 
-    density = 0.5, 
+    density = 2.5, 
 
     friction = 0.5, 
 
@@ -212,7 +223,7 @@ function rightArrow:touch( event )
 
         transition.moveBy( playerBall, { 
 
-            x = 25, -- move 50 pixelfs right
+            x = 25, -- move 50 pixels right
 
             y = 0, 
 
@@ -228,34 +239,125 @@ function rightArrow:touch( event )
 
 end
 
+
+
+
 local function playerCollision (event)
-	if ( event.phase == "began") then
 
-		local thing1 = event.object1
-		local thing2 = event.object2
+	if ( event.phase == "began" ) then
+       local obj1 = event.object1
+       local obj2 = event.object2
 
-		if ((object1.id == "enemy" and object2.id == "player") or
-			(object1.id == "player" and object2.id == "enemy")) then
-
-			display.remove (thing1)
-			display.remove (thing2)
-			local GameOver = display.newText ("Game Over", display.contentCenterX, display.contentCenterY, native.systemFont, 30)
-		end
-	end
+       if (( obj1.id == "enemy" and obj2.id == "player") or
+       	(obj1.id == "player" and obj2.id == "enemy")) then
+       	display.remove (obj1)
+       	display.remove (obj2)
+       	local GameOver = display.newText("Game Over", display.contentCenterX, display.contentCenterY, native.systemFont, 50)
+       end
+   end
 end
 
+local t = {}
+function t:timer( event )
+    local count = event.count
+    local timerT = display.newText ( ""..count, display.contentCenterX, display.contentCenterY + 100, native.systemFont, 30 )
+end
+local gameTimer = timer.performWithDelay( 1000, t, 0 )
 
 
+local eSpeedX = 1
+local eSpeedY = 0
+print(tonumber (eSpeedX))
+print(tonumber (eSpeedY))
+local function enemyMove(event)
+	enemyBall.x = enemyBall.x + eSpeedX
+	enemyBall.y = enemyBall.y + eSpeedY
 
+end
 
+local function rWallBounce(event)
+	if ( event.phase == "began" ) then
+       local obj1 = event.object1
+       local obj2 = event.object2
+
+       if (( obj1.id == "enemy" and obj2.id == "right wall") or
+       	(obj1.id == "right wall" and obj2.id == "enemy")) then
+       		eSpeedX = eSpeedX * -1
+       		eSpeedY = math.random ( -4, 4 )
+       		print("x:"..tonumber (eSpeedX))
+			print("y:"..tonumber (eSpeedY))
+       end
+   end
+end
+
+local function lWallBounce(event)
+	if ( event.phase == "began" ) then
+       local obj1 = event.object1
+       local obj2 = event.object2
+
+       if (( obj1.id == "enemy" and obj2.id == "left wall") or
+       	(obj1.id == "left wall" and obj2.id == "enemy")) then
+       		eSpeedX = eSpeedX * -1
+       		eSpeedY = math.random ( -4, 4 )
+       		print("x:"..tonumber (eSpeedX))
+			print("y:"..tonumber (eSpeedY))
+       end
+   end
+end
+
+local function tWallBounce(event)
+	if ( event.phase == "began" ) then
+       local obj1 = event.object1
+       local obj2 = event.object2
+
+       if (( obj1.id == "enemy" and obj2.id == "top wall") or
+       	(obj1.id == "top wall" and obj2.id == "enemy")) then
+       		eSpeedY = eSpeedY * -1
+       		eSpeedX = math.random ( -4, 4 )
+       		print("x:"..tonumber (eSpeedX))
+			print("y:"..tonumber (eSpeedY))
+       end
+   end
+end
+
+local function bWallBounce(event)
+	if ( event.phase == "began" ) then
+       local obj1 = event.object1
+       local obj2 = event.object2
+
+       if (( obj1.id == "enemy" and obj2.id == "bottom wall") or
+       	(obj1.id == "bottom wall" and obj2.id == "enemy")) then
+       		eSpeedY = eSpeedY * -1
+       		eSpeedX = math.random ( -4, 4 )
+       		print("x:"..tonumber (eSpeedX))
+			print("y:"..tonumber (eSpeedY))
+       end
+   end
+end
+
+local function myUnhandledErrorListener( event )
+ 
+    local iHandledTheError = true
+ 
+    if iHandledTheError then
+        print( "Handling the unhandled error", event.errorMessage )
+    else
+        print( "Not handling the unhandled error", event.errorMessage )
+    end
+    
+    return iHandledTheError
+end
+ 
+Runtime:addEventListener("unhandledError", myUnhandledErrorListener)
 
 upArrow:addEventListener( "touch", upArrow )
 downArrow:addEventListener( "touch", downArrow )
 leftArrow:addEventListener( "touch", leftArrow )
 rightArrow:addEventListener( "touch", rightArrow )
 
-playerBall.collision = playerCollision
-playerBall:addEventListener("collision") 
-
-enemyBall.collision = playerCollision
-enemyBall:addEventListener("collision") 
+Runtime:addEventListener("collision", playerCollision)
+Runtime:addEventListener("collision", rWallBounce)
+Runtime:addEventListener("collision", lWallBounce)
+Runtime:addEventListener("collision", tWallBounce)
+Runtime:addEventListener("collision", bWallBounce)
+Runtime:addEventListener("enterFrame", enemyMove)
